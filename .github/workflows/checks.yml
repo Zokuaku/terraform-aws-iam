@@ -1,0 +1,23 @@
+# Every module runs the same five checks (fmt, validate, tflint, test, scan), defined once in
+# Zokuaku/shared-workflows and pinned here by commit, with the release in a comment.
+name: checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  module:
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - modules/account-password-policy
+          - modules/role
+    uses: Zokuaku/shared-workflows/.github/workflows/terraform-module.yml@9391c609190585cf1f398530d50b4580342b9dff # v0.2.0
+    with:
+      working_directory: ${{ matrix.module }}

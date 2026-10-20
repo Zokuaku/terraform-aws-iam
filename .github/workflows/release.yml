@@ -1,0 +1,15 @@
+# A version tag becomes a GitHub Release whose notes are that version's CHANGELOG section.
+name: release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: Zokuaku/shared-workflows/.github/workflows/release.yml@9391c609190585cf1f398530d50b4580342b9dff # v0.2.0
+    with:
+      tag: ${{ github.ref_name }}
