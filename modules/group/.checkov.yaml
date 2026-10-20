@@ -1,0 +1,6 @@
+# Findings this module accepts on purpose. Each one names its reason; anything else fails the scan.
+skip-check:
+  # AdministratorAccess on a group: this module attaches it only when allow_administrator_access is
+  # true - the break-glass group - and a variable validation plus a test refuse it otherwise. The
+  # break-glass example uses it on purpose.
+  - CKV_AWS_274

@@ -17,7 +17,11 @@ jobs:
       matrix:
         module:
           - modules/account-password-policy
+          - modules/github-oidc
+          - modules/group
+          - modules/policy
           - modules/role
+          - modules/user
     uses: Zokuaku/shared-workflows/.github/workflows/terraform-module.yml@9391c609190585cf1f398530d50b4580342b9dff # v0.2.0
     with:
       working_directory: ${{ matrix.module }}

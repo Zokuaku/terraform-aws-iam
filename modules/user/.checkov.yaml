@@ -1,0 +1,6 @@
+# Findings this module accepts on purpose. Each one names its reason; anything else fails the scan.
+skip-check:
+  # "Access through SSO, not IAM users": that is the design - people sign in through IAM Identity
+  # Center. This module exists only for the break-glass user, for when SSO is unavailable, and it
+  # creates no access key and no password.
+  - CKV_AWS_273
