@@ -15,7 +15,7 @@ module "break_glass_group" {
   source = "../.."
 
   name                       = "break-glass"
-  managed_policy_arns        = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  managed_policy_arns        = { admin = "arn:aws:iam::aws:policy/AdministratorAccess" }
   allow_administrator_access = true
 }
 

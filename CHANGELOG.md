@@ -2,6 +2,32 @@
 
 All notable changes. Versions follow [semantic versioning](https://semver.org/).
 
+## v0.3.0 - 2026-11-09
+
+**Breaking:** `managed_policy_arns` in `role`, `group` and `github-oidc` is now a map keyed by a
+name you choose, not a set.
+
+```hcl
+# before (v0.2.0)
+managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+# after (v0.3.0)
+managed_policy_arns = { read_only = "arn:aws:iam::aws:policy/ReadOnlyAccess" }
+```
+
+Why: a policy created in the same apply - `managed_policy_arns = [module.policy.arn]` - failed
+to plan with `Invalid for_each argument`, because Terraform cannot key `for_each` on values
+unknown until apply. The mocked tests never saw it (a mocked ARN is known at plan time); the
+first apply against a real account did. The map's keys are known at plan, so the ARNs may be.
+Moving an existing attachment to the new address: a `moved` block from
+`aws_iam_role_policy_attachment.this["<arn>"]` to `...this["<key>"]` (likewise for the group and
+the CI role), or let Terraform detach and re-attach.
+
+- Integration tests against a real AWS account in `tests/integration`: apply the composed
+  modules, read every object back through data sources, destroy.
+- A mocked plan-only regression test in each affected module: a policy created in the same
+  configuration is attached.
+- Identity Center permission sets move to v0.4.0.
+
 ## v0.2.0 - 2026-10-20
 
 The identity model: people through IAM Identity Center (next release), CI through GitHub OIDC,

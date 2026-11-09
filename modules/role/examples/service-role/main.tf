@@ -16,7 +16,7 @@ module "instance_role" {
   name                     = "app-instance"
   description              = "Assumed by the application's EC2 instances; read-only."
   trusted_services         = ["ec2.amazonaws.com"]
-  managed_policy_arns      = ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+  managed_policy_arns      = { read_only = "arn:aws:iam::aws:policy/ReadOnlyAccess" }
   permissions_boundary_arn = "arn:aws:iam::123456789012:policy/workload-boundary"
 
   tags = {

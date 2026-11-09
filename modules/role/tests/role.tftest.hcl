@@ -12,7 +12,7 @@ run "a_service_role_trusts_only_its_service" {
 
   variables {
     trusted_services    = ["ec2.amazonaws.com"]
-    managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+    managed_policy_arns = { read_only = "arn:aws:iam::aws:policy/ReadOnlyAccess" }
   }
 
   assert {
@@ -26,7 +26,7 @@ run "a_service_role_trusts_only_its_service" {
   }
 
   assert {
-    condition     = keys(aws_iam_role_policy_attachment.this) == ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+    condition     = keys(aws_iam_role_policy_attachment.this) == ["read_only"]
     error_message = "The managed policy was not attached exactly once."
   }
 
@@ -75,7 +75,7 @@ run "administrator_access_is_refused" {
 
   variables {
     trusted_services    = ["ec2.amazonaws.com"]
-    managed_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+    managed_policy_arns = { admin = "arn:aws:iam::aws:policy/AdministratorAccess" }
   }
 
   expect_failures = [var.managed_policy_arns]
@@ -90,4 +90,19 @@ run "a_session_longer_than_twelve_hours_is_refused" {
   }
 
   expect_failures = [var.max_session_duration]
+}
+
+# Regression (v0.3.0): with managed_policy_arns as a set, a policy created in the same apply could
+# not be planned ("Invalid for_each argument"); keyed by name, the keys are known and it plans.
+run "a_policy_created_in_the_same_apply_can_be_attached" {
+  command = plan
+
+  module {
+    source = "./tests/same-apply-policy"
+  }
+
+  assert {
+    condition     = output.planned
+    error_message = "The configuration did not plan."
+  }
 }
