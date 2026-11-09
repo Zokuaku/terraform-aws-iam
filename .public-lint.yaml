@@ -3,3 +3,11 @@
 allow:
   emails:
     - "noreply@anthropic.com"   # the co-author trailer: commits here are written with Claude Code
+  # Commits here are made in UTC under one identity, and merged by fast-forward. This one was
+  # merged with GitHub's button instead (a squash): GitHub wrote it under its own committer
+  # identity, in the merger's time zone. It is published, so it is accepted as it is - by full id,
+  # which can never cover a commit that does not exist yet.
+  timezone_commits:
+    - "85c27263f36c9aea67904b7d54cb1ce8afa9ec50"   # Policies keyed by name ... (v0.3.0) (#2)
+  identity_commits:
+    - "85c27263f36c9aea67904b7d54cb1ce8afa9ec50"   # Policies keyed by name ... (v0.3.0) (#2)
