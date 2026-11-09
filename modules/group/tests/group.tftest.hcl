@@ -9,7 +9,7 @@ run "a_group_requires_mfa_by_default" {
   command = apply
 
   variables {
-    managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+    managed_policy_arns = { read_only = "arn:aws:iam::aws:policy/ReadOnlyAccess" }
   }
 
   assert {
@@ -26,7 +26,7 @@ run "a_group_requires_mfa_by_default" {
   }
 
   assert {
-    condition     = keys(aws_iam_group_policy_attachment.this) == ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+    condition     = keys(aws_iam_group_policy_attachment.this) == ["read_only"]
     error_message = "The managed policy was not attached exactly once."
   }
 }
@@ -35,7 +35,7 @@ run "administrator_access_is_refused_unless_asked_for" {
   command = plan
 
   variables {
-    managed_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+    managed_policy_arns = { admin = "arn:aws:iam::aws:policy/AdministratorAccess" }
   }
 
   expect_failures = [var.managed_policy_arns]
@@ -46,12 +46,27 @@ run "a_break_glass_group_may_hold_administrator_access" {
 
   variables {
     name                       = "break-glass"
-    managed_policy_arns        = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+    managed_policy_arns        = { admin = "arn:aws:iam::aws:policy/AdministratorAccess" }
     allow_administrator_access = true
   }
 
   assert {
     condition     = length(aws_iam_group_policy_attachment.this) == 1 && length(aws_iam_group_policy.require_mfa) == 1
     error_message = "A break-glass group should hold AdministratorAccess and still require MFA."
+  }
+}
+
+# Regression (v0.3.0): with managed_policy_arns as a set, a policy created in the same apply could
+# not be planned ("Invalid for_each argument"); keyed by name, the keys are known and it plans.
+run "a_policy_created_in_the_same_apply_can_be_attached" {
+  command = plan
+
+  module {
+    source = "./tests/same-apply-policy"
+  }
+
+  assert {
+    condition     = output.planned
+    error_message = "The configuration did not plan."
   }
 }

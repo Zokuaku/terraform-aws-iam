@@ -52,17 +52,17 @@ variable "trusted_role_arns" {
 }
 
 variable "managed_policy_arns" {
-  description = "Managed policies to attach to the role."
-  type        = set(string)
-  default     = []
+  description = "Managed policies to attach to the role, keyed by a name you choose: { read_only = <policy ARN> }. The keys must be known at plan time; the ARNs may come from policies created in the same apply."
+  type        = map(string)
+  default     = {}
 
   validation {
-    condition     = alltrue([for a in var.managed_policy_arns : can(regex("^arn:aws[a-z-]*:iam::([0-9]{12}|aws):policy/", a))])
+    condition     = alltrue([for a in values(var.managed_policy_arns) : can(regex("^arn:aws[a-z-]*:iam::([0-9]{12}|aws):policy/", a))])
     error_message = "Each entry must be a managed policy ARN."
   }
 
   validation {
-    condition     = !anytrue([for a in var.managed_policy_arns : endswith(a, ":policy/AdministratorAccess")])
+    condition     = !anytrue([for a in values(var.managed_policy_arns) : endswith(a, ":policy/AdministratorAccess")])
     error_message = "AdministratorAccess is not attached through this module; break-glass access is managed separately."
   }
 }

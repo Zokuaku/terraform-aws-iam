@@ -17,7 +17,7 @@ module "ci_plan" {
   role_name           = "ci-plan"
   role_description    = "terraform plan for pull requests; read-only."
   subjects            = ["repo:example-org/infrastructure-live:pull_request"]
-  managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+  managed_policy_arns = { read_only = "arn:aws:iam::aws:policy/ReadOnlyAccess" }
 }
 
 module "ci_apply" {
